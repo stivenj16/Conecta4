@@ -6,14 +6,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import com.example.conecta4.ui.theme.data.VocabularyRepository
 import com.example.conecta4.ui.theme.model.GameState
 import com.example.conecta4.ui.theme.model.Move
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 @Composable
-fun GameScreen() {
+fun GameScreen(onVolverAlMenu: () -> Unit) {
     val gameState = remember { mutableStateOf(GameState()) }
     val vocabularyRepo = VocabularyRepository()
     val showDialog = remember { mutableStateOf(true) }
@@ -118,7 +118,28 @@ fun GameScreen() {
             } else {
                 Text("Ganador: Jugador ${gameState.value.winner}", color = Color.Green)
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = {
+                    gameState.value = GameState()
+                    word.value = vocabularyRepo.getRandomWord()
+                    showDialog.value = true
+                    allowMove.value = false
+                }) {
+                    Text("Reiniciar")
+                }
+
+                Button(onClick = {
+                    // Volver al menú (usa una lambda de navegación que pasaremos)
+                    onVolverAlMenu()
+                }) {
+                    Text("Volver")
+                }
+            }
         }
+
 
         if (showDialog.value && gameState.value.currentPlayer == 1) {
             VocabularyDialog(word.value) { isCorrect ->

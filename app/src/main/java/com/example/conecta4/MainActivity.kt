@@ -31,7 +31,10 @@ class MainActivity : ComponentActivity() {
                         playerTag = tagJugador
                     }
 
-                    "IA" -> GameScreen()
+                    "IA" -> GameScreen {
+                        modoJuego = "" // ← esto hace que vuelva al LobbyScreen
+                    }
+
 
                     "ESPERA" -> WaitingScreen(
                         salaId = salaId,
@@ -45,8 +48,12 @@ class MainActivity : ComponentActivity() {
 
                     "ONLINE" -> GameScreenOnline(
                         salaId = salaId,
-                        playerTag = playerTag
+                        playerTag = playerTag,
+                        onVolverAlMenu = {
+                            modoJuego = "" // ← esto hace que regrese al LobbyScreen
+                        }
                     )
+
                 }
 
             }

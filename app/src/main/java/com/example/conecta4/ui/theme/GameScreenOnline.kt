@@ -17,7 +17,7 @@ import com.google.firebase.database.GenericTypeIndicator
 
 
 @Composable
-fun GameScreenOnline(salaId: String, playerTag: String) {
+fun GameScreenOnline(salaId: String, playerTag: String, onVolverAlMenu: () -> Unit) {
     val scope = rememberCoroutineScope()
     val repo = VocabularyRepository()
 
@@ -111,6 +111,11 @@ fun GameScreenOnline(salaId: String, playerTag: String) {
                 FirebaseGameService.reiniciarSala(salaId)
             }) {
                 Text("Reiniciar partida")
+            }
+            Button(onClick = {
+                onVolverAlMenu()
+            }) {
+                Text("Volver")
             }
         }
 

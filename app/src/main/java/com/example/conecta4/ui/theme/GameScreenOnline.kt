@@ -104,7 +104,16 @@ fun GameScreenOnline(salaId: String, playerTag: String) {
             } else {
                 Text("Ganó: ${ganador.value}", color = Color.Green)
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Button(onClick = {
+                FirebaseGameService.reiniciarSala(salaId)
+            }) {
+                Text("Reiniciar partida")
+            }
         }
+
 
         // Diálogo para responder palabra antes de jugar
         if (showDialog.value) {

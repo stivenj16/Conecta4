@@ -1,27 +1,20 @@
 package com.example.conecta4.ui.theme
 
-import ads_mobile_sdk.h4
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import com.example.conecta4.ui.theme.data.VocabularyRepository
 import com.example.conecta4.ui.theme.model.GameState
-import com.example.conecta4.ui.theme.model.Move
-import androidx.compose.material3.Text
-import androidx.compose.ui.draw.clip
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 @Composable
 fun GameScreen(onVolverAlMenu: () -> Unit) {
@@ -49,61 +42,75 @@ fun GameScreen(onVolverAlMenu: () -> Unit) {
         }
     }
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
+    ) {
         Text("Conecta 4", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
 
-        Column(
+        // TABLERO ADAPTATIVO
+        BoxWithConstraints(
             modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(7f / 6f)
                 .background(Color(0xFF3366CC))
                 .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            contentAlignment = Alignment.Center
         ) {
-            for (row in 0 until 6) {
-                Row {
-                    for (col in 0 until 7) {
-                        Box(
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .size(48.dp)
-                                .clip(CircleShape)
-                                .background(colorForCell(gameState.value.board[row][col]))
-                                .clickable(enabled = !gameState.value.isGameOver && allowMove.value && gameState.value.board[0][col] == 0 && gameState.value.currentPlayer == 1) {
-                                    if (dropDisc(gameState.value, col, 1)) {
-                                        gameState.value.totalMoves++
-                                        if (checkVictory(gameState.value.board, 1)) {
-                                            gameState.value = gameState.value.copy(isGameOver = true, winner = 1)
-                                        } else if (gameState.value.totalMoves == 42) {
-                                            gameState.value = gameState.value.copy(isGameOver = true, winner = 0)
-                                        } else {
-                                            gameState.value.currentPlayer = 2
-                                            scope.launch {
-                                                delay(1000)
-                                                showDialog.value = false
-                                                allowMove.value = true
+            val cellSize = maxWidth / 7
 
-                                                val colBot = getBestMove(gameState.value)
-                                                if (colBot != -1 && dropDisc(gameState.value, colBot, 2)) {
-                                                    gameState.value.totalMoves++
-                                                    if (checkVictory(gameState.value.board, 2)) {
-                                                        gameState.value = gameState.value.copy(isGameOver = true, winner = 2)
-                                                    } else if (gameState.value.totalMoves == 42) {
-                                                        gameState.value = gameState.value.copy(isGameOver = true, winner = 0)
-                                                    } else {
-                                                        gameState.value.currentPlayer = 1
-                                                        word.value = vocabularyRepo.getRandomWord()
-                                                        showDialog.value = true
-                                                        allowMove.value = false
+            Column {
+                for (row in 0 until 6) {
+                    Row {
+                        for (col in 0 until 7) {
+                            Box(
+                                modifier = Modifier
+                                    .size(cellSize)
+                                    .padding(2.dp)
+                                    .clip(CircleShape)
+                                    .background(colorForCell(gameState.value.board[row][col]))
+                                    .clickable(
+                                        enabled = !gameState.value.isGameOver &&
+                                                allowMove.value &&
+                                                gameState.value.board[0][col] == 0 &&
+                                                gameState.value.currentPlayer == 1
+                                    ) {
+                                        if (dropDisc(gameState.value, col, 1)) {
+                                            gameState.value.totalMoves++
+                                            if (checkVictory(gameState.value.board, 1)) {
+                                                gameState.value = gameState.value.copy(isGameOver = true, winner = 1)
+                                            } else if (gameState.value.totalMoves == 42) {
+                                                gameState.value = gameState.value.copy(isGameOver = true, winner = 0)
+                                            } else {
+                                                gameState.value.currentPlayer = 2
+                                                scope.launch {
+                                                    delay(1000)
+                                                    showDialog.value = false
+                                                    allowMove.value = true
+
+                                                    val colBot = getBestMove(gameState.value)
+                                                    if (colBot != -1 && dropDisc(gameState.value, colBot, 2)) {
+                                                        gameState.value.totalMoves++
+                                                        if (checkVictory(gameState.value.board, 2)) {
+                                                            gameState.value = gameState.value.copy(isGameOver = true, winner = 2)
+                                                        } else if (gameState.value.totalMoves == 42) {
+                                                            gameState.value = gameState.value.copy(isGameOver = true, winner = 0)
+                                                        } else {
+                                                            gameState.value.currentPlayer = 1
+                                                            word.value = vocabularyRepo.getRandomWord()
+                                                            showDialog.value = true
+                                                            allowMove.value = false
+                                                        }
                                                     }
                                                 }
                                             }
-
                                         }
-                                    }
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("")
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("")
+                            }
                         }
                     }
                 }
@@ -132,14 +139,12 @@ fun GameScreen(onVolverAlMenu: () -> Unit) {
                 }
 
                 Button(onClick = {
-                    // Volver al menú (usa una lambda de navegación que pasaremos)
                     onVolverAlMenu()
                 }) {
                     Text("Volver")
                 }
             }
         }
-
 
         if (showDialog.value && gameState.value.currentPlayer == 1) {
             VocabularyDialog(word.value) { isCorrect ->
@@ -156,6 +161,7 @@ fun GameScreen(onVolverAlMenu: () -> Unit) {
         }
     }
 }
+
 
 fun getBestMove(state: GameState): Int {
     val board = state.board

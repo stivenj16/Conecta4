@@ -34,6 +34,7 @@ fun GameScreenOnline(salaId: String, playerTag: String, onVolverAlMenu: () -> Un
             val type = object : GenericTypeIndicator<List<List<Long>>>() {}
             val boardFirebase = boardSnapshot.getValue(type)
 
+
             if (boardFirebase != null) {
                 board.value = boardFirebase.map { row -> row.map { it.toInt() }.toMutableList() }
             }
@@ -127,7 +128,7 @@ fun GameScreenOnline(salaId: String, playerTag: String, onVolverAlMenu: () -> Un
             }
         }
 
-        if (showDialog.value) {
+        if (showDialog.value && turnoActual.value == playerTag) {
             VocabularyDialog(palabra.value) { correcto ->
                 showDialog.value = false
                 puedeJugar.value = correcto
@@ -140,6 +141,7 @@ fun GameScreenOnline(salaId: String, playerTag: String, onVolverAlMenu: () -> Un
                 }
             }
         }
+
     }
 }
 
